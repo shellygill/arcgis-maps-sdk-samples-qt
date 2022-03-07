@@ -1,14 +1,22 @@
-// Copyright 2022 ESRI
-//
-// All rights reserved under the copyright laws of the United States
-// and applicable international laws, treaties, and conventions.
-//
-// You may freely redistribute and use this sample code, with or
-// without modification, provided you include the original copyright
-// notice and use restrictions.
-//
-// See the Sample code usage restrictions document for further information.
-//
+// [WriteFile Name=GraphicsMemoryManagementDemo, Category=Analysis]
+// [Legal]
+// Copyright 2022 Esri.
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// [Legal]
+
+#ifdef PCH_BUILD
+#include "pch.hpp"
+#endif // PCH_BUILD
 
 #include "GraphicsMemoryManagementDemo.h"
 
@@ -42,6 +50,13 @@ GraphicsMemoryManagementDemo::~GraphicsMemoryManagementDemo()
 {
 }
 
+void GraphicsMemoryManagementDemo::init()
+{
+  // Register the map view for QML
+  qmlRegisterType<MapQuickView>("Esri.Samples", 1, 0, "MapView");
+  qmlRegisterType<GraphicsMemoryManagementDemo>("Esri.Samples", 1, 0, "GraphicsMemoryManagementDemoSample");
+}
+
 MapQuickView* GraphicsMemoryManagementDemo::mapView() const
 {
   return m_mapView;
@@ -69,18 +84,13 @@ void GraphicsMemoryManagementDemo::setMapView(MapQuickView* mapView)
   });
 }
 
-void GraphicsMemoryManagementDemo::clearGraphics()
-{
-  m_graphicsOverlay->graphics()->clear();
-  m_graphicsParent.reset(new QObject);
-}
-
 void GraphicsMemoryManagementDemo::badMemoryManagement()
 {
   for (int i = 0; i < 100'000; ++i)
   {
     m_graphicsOverlay->graphics()->append(new Graphic(Point(rand()*40,rand()*40), this));
   }
+  emit graphicsOverlayCountChanged();
 }
 
 void GraphicsMemoryManagementDemo::properMemoryManagement()
@@ -89,8 +99,20 @@ void GraphicsMemoryManagementDemo::properMemoryManagement()
   {
     m_graphicsOverlay->graphics()->append(new Graphic(Point(rand()*40,rand()*40), m_graphicsParent.get()));
   }
+  emit graphicsOverlayCountChanged();
 }
 
+void GraphicsMemoryManagementDemo::clearGraphics()
+{
+  m_graphicsOverlay->graphics()->clear();
+  m_graphicsParent.reset(new QObject);
+  emit graphicsOverlayCountChanged();
+}
+
+int GraphicsMemoryManagementDemo::graphicsOverlayCount() const
+{
+  return m_graphicsOverlay->graphics()->size();
+}
 
 
 
@@ -110,7 +132,7 @@ void GraphicsMemoryManagementDemo::memoryUsage()
   }
 }
 
-double GraphicsMemoryManagementDemo::usedMemory()
+double GraphicsMemoryManagementDemo::usedMemory() const
 {
   return m_usedMemory;
 }
