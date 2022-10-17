@@ -78,7 +78,7 @@ void GeotriggersIndoorsDemo::loadMmpk()
     auto viewpoint = Viewpoint(Point(1490859.0920245973, 6893208.26561209, SpatialReference::webMercator()), 2000);
     m_map->setInitialViewpoint(viewpoint);
 
-    connect(m_map, &Map::doneLoading, this, [this](Error loadError)
+    connect(m_map, &Map::doneLoading, this, [this](const Error& /*loadError*/)
     {
       if (m_map->loadStatus() != LoadStatus::Loaded)
       {
@@ -199,14 +199,48 @@ void GeotriggersIndoorsDemo::initializeSimulatedLocationDisplay()
     return Location(startTime, position, 0.0, 0.0, 0.0, 123, false, additionalSourceProperties);
   };
 
+  auto createLocWithoutFloor = [&startTime](Point position)
+  {
+    startTime = startTime.addSecs(1);
+
+    return Location(startTime, position, 0.0, 0.0, 0.0, 123, false);
+  };
+
   QList<Location> locations = {
-    createLocWithFloor(Point(1490693.7996604848, 6893194.7931713564, SpatialReference::webMercator()), 0),
+    createLocWithoutFloor(Point(1490693.7996604848, 6893194.7931713564, SpatialReference::webMercator())),
     createLocWithFloor(Point(1490859.0920245973, 6893208.26561209, SpatialReference::webMercator()), 0),
     createLocWithFloor(Point(1490859.0920245973, 6893208.26561209, SpatialReference::webMercator()), 1),
-    createLocWithFloor(Point(1490974.6145278704, 6893211.6140904455, SpatialReference::webMercator()), 0)
+    createLocWithoutFloor(Point(1490974.6145278704, 6893211.6140904455, SpatialReference::webMercator()))
   };
 
   m_locationDataSource->setLocations(locations);
+  m_locationDataSource->setIterationRate(0.5);
+
+  connect(m_locationDataSource, &AbstractLocationDataSource::locationChanged, this, [this](const Location& newLocation)
+  {
+    if (newLocation.additionalSourceProperties().contains(LocationSourcePropertiesKeys::floor()))
+    {
+      auto newFloor = newLocation.additionalSourceProperties()[LocationSourcePropertiesKeys::floor()].toInt();
+      if (newFloor == m_currentFloor)
+      {
+        return;
+      }
+
+      m_currentFloor = newFloor;
+
+      if (m_currentFloor == 0)
+      {
+        qDebug("floor 0");
+        m_floorManager->levels().at(0)->setVisible(true);
+        m_floorManager->levels().at(1)->setVisible(false);
+      }
+      else if (m_currentFloor == 1)
+      {
+        m_floorManager->levels().at(0)->setVisible(false);
+        m_floorManager->levels().at(1)->setVisible(true);
+      }
+    }
+  });
 
   m_mapView->locationDisplay()->setDataSource(m_locationDataSource);
   m_mapView->locationDisplay()->setAutoPanMode(LocationDisplayAutoPanMode::Off);

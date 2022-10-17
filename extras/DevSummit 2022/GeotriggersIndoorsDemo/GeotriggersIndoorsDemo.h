@@ -59,6 +59,7 @@ private:
   Esri::ArcGISRuntime::FeatureTable* m_buildingFootprintTable = nullptr;
   Esri::ArcGISRuntime::FeatureLayer* m_layerToToggle = nullptr;
   Esri::ArcGISRuntime::FloorManager* m_floorManager = nullptr;
+  int m_currentFloor{-1};
 };
 
 #endif // GEOTRIGGERSINDOORSDEMO_H
