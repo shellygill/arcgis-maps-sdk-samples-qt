@@ -95,6 +95,8 @@ void GeotriggersParcelDemo::loadMmpk()
   mmpk->load();
 }
 
+// check I can commit
+
 void GeotriggersParcelDemo::runGeotriggers()
 {
   m_userHorizontalAccuracy = 10;

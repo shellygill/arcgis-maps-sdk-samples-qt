@@ -1,21 +1,17 @@
-// [WriteFile Name=GeotriggersToggleLayersDemo, Category=Analysis]
-// [Legal]
-// Copyright 2022 Esri.
+// Copyright 2022 ESRI
+//
+// All rights reserved under the copyright laws of the United States
+// and applicable international laws, treaties, and conventions.
+//
+// You may freely redistribute and use this sample code, with or
+// without modification, provided you include the original copyright
+// notice and use restrictions.
+//
+// See the Sample code usage restrictions document for further information.
+//
 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
-
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// [Legal]
-
-#ifndef GEOTRIGGERSTOGGLELAYERSDEMO_H
-#define GEOTRIGGERSTOGGLELAYERSDEMO_H
+#ifndef GEOTRIGGERSINDOORSDEMO_H
+#define GEOTRIGGERSINDOORSDEMO_H
 
 namespace Esri
 {
@@ -26,24 +22,22 @@ class MapQuickView;
 class SimulatedLocationDataSource;
 class LocationGeotriggerFeed;
 class FeatureLayer;
-class GroupLayer;
 class FeatureTable;
+class FloorManager;
 }
 }
 
 #include <QObject>
 
-class GeotriggersToggleLayersDemo : public QObject
+class GeotriggersIndoorsDemo : public QObject
 {
   Q_OBJECT
 
   Q_PROPERTY(Esri::ArcGISRuntime::MapQuickView* mapView READ mapView WRITE setMapView NOTIFY mapViewChanged)
 
 public:
-  explicit GeotriggersToggleLayersDemo(QObject* parent = nullptr);
-  ~GeotriggersToggleLayersDemo();
-
-  static void init();
+  explicit GeotriggersIndoorsDemo(QObject* parent = nullptr);
+  ~GeotriggersIndoorsDemo() override;
 
 signals:
   void mapViewChanged();
@@ -64,6 +58,7 @@ private:
   Esri::ArcGISRuntime::FeatureLayer* m_indoorLayers = nullptr;
   Esri::ArcGISRuntime::FeatureTable* m_buildingFootprintTable = nullptr;
   Esri::ArcGISRuntime::FeatureLayer* m_layerToToggle = nullptr;
+  Esri::ArcGISRuntime::FloorManager* m_floorManager = nullptr;
 };
 
-#endif // GEOTRIGGERSTOGGLELAYERSDEMO_H
+#endif // GEOTRIGGERSINDOORSDEMO_H

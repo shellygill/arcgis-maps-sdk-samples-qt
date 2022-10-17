@@ -1,24 +1,16 @@
-// [WriteFile Name=GeotriggersToggleLayersDemo, Category=Analysis]
-// [Legal]
-// Copyright 2022 Esri.
+// Copyright 2022 ESRI
+//
+// All rights reserved under the copyright laws of the United States
+// and applicable international laws, treaties, and conventions.
+//
+// You may freely redistribute and use this sample code, with or
+// without modification, provided you include the original copyright
+// notice and use restrictions.
+//
+// See the Sample code usage restrictions document for further information.
+//
 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
-
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// [Legal]
-
-#ifdef PCH_BUILD
-#include "pch.hpp"
-#endif // PCH_BUILD
-
-#include "GeotriggersToggleLayersDemo.h"
+#include "GeotriggersIndoorsDemo.h"
 
 #include "Map.h"
 #include "MapQuickView.h"
@@ -38,32 +30,31 @@
 #include "FeatureTable.h"
 #include "ServiceFeatureTable.h"
 #include "FeatureLayer.h"
+#include "FloorManager.h"
+#include "FloorLevel.h"
+#include "LocationSourcePropertiesKeys.h"
 
 #include <QDir>
 
 using namespace Esri::ArcGISRuntime;
 
-GeotriggersToggleLayersDemo::GeotriggersToggleLayersDemo(QObject* parent /* = nullptr */):
-  QObject(parent)
+GeotriggersIndoorsDemo::GeotriggersIndoorsDemo(QObject* parent /* = nullptr */):
+  QObject(parent),
+  m_map(new Map(BasemapStyle::ArcGISStreets, this))
 {
 }
 
-GeotriggersToggleLayersDemo::~GeotriggersToggleLayersDemo() = default;
-
-void GeotriggersToggleLayersDemo::init()
+GeotriggersIndoorsDemo::~GeotriggersIndoorsDemo()
 {
-  // Register the map view for QML
-  qmlRegisterType<MapQuickView>("Esri.Samples", 1, 0, "MapView");
-  qmlRegisterType<GeotriggersToggleLayersDemo>("Esri.Samples", 1, 0, "GeotriggersToggleLayersDemoSample");
 }
 
-MapQuickView* GeotriggersToggleLayersDemo::mapView() const
+MapQuickView* GeotriggersIndoorsDemo::mapView() const
 {
   return m_mapView;
 }
 
 // Set the view (created in QML)
-void GeotriggersToggleLayersDemo::setMapView(MapQuickView* mapView)
+void GeotriggersIndoorsDemo::setMapView(MapQuickView* mapView)
 {
   if (!mapView || mapView == m_mapView)
     return;
@@ -75,7 +66,7 @@ void GeotriggersToggleLayersDemo::setMapView(MapQuickView* mapView)
   emit mapViewChanged();
 }
 
-void GeotriggersToggleLayersDemo::loadMmpk()
+void GeotriggersIndoorsDemo::loadMmpk()
 {
   MobileMapPackage* mmpk = new MobileMapPackage(QDir::homePath() + "/ArcGIS/Runtime/Data/mmpk/devSummitBerlin2022/BerlinDevSummit_10_13.mmpk", this);
 
@@ -86,6 +77,51 @@ void GeotriggersToggleLayersDemo::loadMmpk()
 
     auto viewpoint = Viewpoint(Point(1490859.0920245973, 6893208.26561209, SpatialReference::webMercator()), 2000);
     m_map->setInitialViewpoint(viewpoint);
+
+    connect(m_map, &Map::doneLoading, this, [this](Error loadError)
+    {
+      if (m_map->loadStatus() != LoadStatus::Loaded)
+      {
+        return;
+      }
+
+      // Load floor manager
+      m_floorManager = m_map->floorManager();
+
+      if (m_floorManager == nullptr)
+      {
+        qDebug() << "null floormanager";
+      }
+      else
+      {
+        qDebug("got floormanager");
+      }
+
+      connect(m_floorManager, &FloorManager::errorOccurred, this, [](Error err)
+      {
+        if (!err.isEmpty())
+        {
+          qDebug() << err.message() << err.additionalMessage();
+        }
+      });
+
+      connect(m_floorManager, &FloorManager::doneLoading, this, [this](const Error& /*loadError*/)
+      {
+
+        // Initially don't show any levels
+        if (m_floorManager && m_floorManager->loadStatus() == LoadStatus::Loaded)
+        {
+          for (FloorLevel* level : m_floorManager->levels())
+          {
+            level->setVisible(false);
+          }
+        }
+      });
+
+      m_floorManager->load();
+    });
+
+    m_map->load();
 
     for (auto layer : *m_map->operationalLayers())
     {
@@ -107,7 +143,8 @@ void GeotriggersToggleLayersDemo::loadMmpk()
   mmpk->load();
 }
 
-void GeotriggersToggleLayersDemo::runGeotriggers()
+
+void GeotriggersIndoorsDemo::runGeotriggers()
 {
   // Use the user's location as input data
   m_geotriggerFeed = new LocationGeotriggerFeed(m_locationDataSource, this);
@@ -146,18 +183,30 @@ void GeotriggersToggleLayersDemo::runGeotriggers()
   geotriggerMonitor->start();
 }
 
-void GeotriggersToggleLayersDemo::initializeSimulatedLocationDisplay()
+void GeotriggersIndoorsDemo::initializeSimulatedLocationDisplay()
 {
   m_locationDataSource = new SimulatedLocationDataSource(this);
 
-  SimulationParameters* simulationParameters = new SimulationParameters(QDateTime::currentDateTime(), 10, 0.0, 0.0, this);
+  auto startTime = QDateTime::currentDateTime();
 
-  PolylineBuilder polylineBuilder(SpatialReference::webMercator());
-  polylineBuilder.addPoint(1490693.7996604848, 6893194.7931713564);
-  polylineBuilder.addPoint(1490859.0920245973, 6893208.26561209);
-  polylineBuilder.addPoint(1490974.6145278704, 6893211.6140904455);
+  auto createLocWithFloor = [&startTime](Point position, int floor)
+  {
+    startTime = startTime.addSecs(1);
 
-  m_locationDataSource->setLocationsWithPolyline(polylineBuilder.toPolyline(), simulationParameters);
+    QVariantMap additionalSourceProperties;
+    additionalSourceProperties.insert(LocationSourcePropertiesKeys::floor(), floor);
+
+    return Location(startTime, position, 0.0, 0.0, 0.0, 123, false, additionalSourceProperties);
+  };
+
+  QList<Location> locations = {
+    createLocWithFloor(Point(1490693.7996604848, 6893194.7931713564, SpatialReference::webMercator()), 0),
+    createLocWithFloor(Point(1490859.0920245973, 6893208.26561209, SpatialReference::webMercator()), 0),
+    createLocWithFloor(Point(1490859.0920245973, 6893208.26561209, SpatialReference::webMercator()), 1),
+    createLocWithFloor(Point(1490974.6145278704, 6893211.6140904455, SpatialReference::webMercator()), 0)
+  };
+
+  m_locationDataSource->setLocations(locations);
 
   m_mapView->locationDisplay()->setDataSource(m_locationDataSource);
   m_mapView->locationDisplay()->setAutoPanMode(LocationDisplayAutoPanMode::Off);
