@@ -108,7 +108,7 @@ void GeotriggersIndoorsDemo::loadMmpk()
       connect(m_floorManager, &FloorManager::doneLoading, this, [this](const Error& /*loadError*/)
       {
 
-        // Initially don't show any levels
+        // Initially don't show any levels some changes
         if (m_floorManager && m_floorManager->loadStatus() == LoadStatus::Loaded)
         {
           for (FloorLevel* level : m_floorManager->levels())
