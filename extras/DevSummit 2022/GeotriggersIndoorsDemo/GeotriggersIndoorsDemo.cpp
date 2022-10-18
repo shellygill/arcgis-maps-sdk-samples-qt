@@ -208,13 +208,13 @@ void GeotriggersIndoorsDemo::initializeSimulatedLocationDisplay()
 
   QList<Location> locations = {
     createLocWithoutFloor(Point(1490693.7996604848, 6893194.7931713564, SpatialReference::webMercator())),
-    createLocWithFloor(Point(1490859.0920245973, 6893208.26561209, SpatialReference::webMercator()), 0),
-    createLocWithFloor(Point(1490859.0920245973, 6893208.26561209, SpatialReference::webMercator()), 1),
+    createLocWithFloor(Point(1490826.283691264, 6893204.0322787566, SpatialReference::webMercator()), 0),
+    createLocWithFloor(Point(1490891.9003579305, 6893214.6156120896, SpatialReference::webMercator()), 1),
     createLocWithoutFloor(Point(1490974.6145278704, 6893211.6140904455, SpatialReference::webMercator()))
   };
 
   m_locationDataSource->setLocations(locations);
-  m_locationDataSource->setIterationRate(0.5);
+  m_locationDataSource->setIterationRate(0.3);
 
   connect(m_locationDataSource, &AbstractLocationDataSource::locationChanged, this, [this](const Location& newLocation)
   {
