@@ -377,6 +377,12 @@ void GenerateOfflineMap_Overrides::takeMapOffline()
     qDebug() << e.message() << e.additionalMessage();
   });
 
+  connect(generateJob, &GenerateOfflineMapJob::messageAdded, this, [this](const JobMessage& message)
+  {
+    m_currentMessage = message.message();
+    emit currentMessageChanged();
+  });
+
   // start the generate job
   generateJob->start();
 }
@@ -464,6 +470,11 @@ void GenerateOfflineMap_Overrides::setBusy(bool busy)
 {
   m_taskBusy = busy;
   emit taskBusyChanged();
+}
+
+QString GenerateOfflineMap_Overrides::currentMessage() const
+{
+  return m_currentMessage;
 }
 
 bool GenerateOfflineMap_Overrides::mapLoaded() const

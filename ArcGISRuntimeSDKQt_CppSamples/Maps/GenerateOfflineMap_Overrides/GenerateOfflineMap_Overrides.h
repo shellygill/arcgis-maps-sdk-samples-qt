@@ -43,6 +43,7 @@ class GenerateOfflineMap_Overrides: public QQuickItem
   Q_PROPERTY(bool mapLoaded READ mapLoaded NOTIFY mapLoadedChanged)
   Q_PROPERTY(bool overridesReady READ overridesReady NOTIFY overridesReadyChanged)
   Q_PROPERTY(bool taskBusy READ taskBusy NOTIFY taskBusyChanged)
+  Q_PROPERTY(QString currentMessage READ currentMessage NOTIFY currentMessageChanged)
 
 public:
   explicit GenerateOfflineMap_Overrides(QQuickItem* parent = nullptr);
@@ -69,6 +70,7 @@ signals:
   void updateProgress(int progress);
   void showLayerErrors(const QString& error);
   void overridesReadyChanged();
+  void currentMessageChanged();
 
 private:
   static QString webMapId();
@@ -78,6 +80,7 @@ private:
   void removeFeatureLayer(const QString& layerName);
   Esri::ArcGISRuntime::FeatureLayer* getFeatureLayerByName(const QString& layerName);
   void setBusy(bool busy);
+  QString currentMessage() const;
 
 private:
   bool m_taskBusy = false;
@@ -90,6 +93,7 @@ private:
   static const QString s_webMapId;
   bool m_mapLoaded = false;
   QTemporaryDir m_tempPath;
+  QString m_currentMessage;
 };
 
 #endif // GENERATEOFFLINEMAP_OVERRIDES_H

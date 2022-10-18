@@ -28,6 +28,7 @@ GenerateOfflineMap_OverridesSample {
 
     onUpdateStatus: generateWindow.statusText = status;
     onUpdateProgress: generateWindow.progressText = progress;
+    onCurrentMessageChanged: generateWindow.jobMessage = offlineMapOverridesSample.currentMessage
     onHideWindow: {
         generateWindow.hideWindow(time);
 
