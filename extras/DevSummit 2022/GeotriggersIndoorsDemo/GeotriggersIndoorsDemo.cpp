@@ -230,7 +230,6 @@ void GeotriggersIndoorsDemo::initializeSimulatedLocationDisplay()
 
       if (m_currentFloor == 0)
       {
-        qDebug("floor 0");
         m_floorManager->levels().at(0)->setVisible(true);
         m_floorManager->levels().at(1)->setVisible(false);
       }
