@@ -18,6 +18,7 @@
 #include <QQmlEngine>
 
 #include "ArcGISRuntimeEnvironment.h"
+#include <Esri/ArcGISRuntime/Toolkit/register.h>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -60,6 +61,8 @@ int main(int argc, char *argv[])
   view.setResizeMode(QQuickView::SizeRootObjectToView);
 
   QString arcGISRuntimeImportPath = QUOTE(ARCGIS_RUNTIME_IMPORT_PATH);
+
+  Esri::ArcGISRuntime::Toolkit::registerComponents(*(view.engine()));
 
 #if defined(LINUX_PLATFORM_REPLACEMENT)
   // on some linux platforms the string 'linux' is replaced with 1

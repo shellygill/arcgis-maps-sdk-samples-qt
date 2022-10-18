@@ -23,6 +23,7 @@ Rectangle {
 
     property string statusText: "Starting"
     property string progressText: "0"
+    property string jobMessage: ""
 
     RadialGradient {
         anchors.fill: parent
@@ -41,8 +42,8 @@ Rectangle {
 
     Rectangle {
         anchors.centerIn: parent
-        width: 135
-        height: 100
+        width: 140
+        height: busyIndicator.height + topText.height + bottonText.height + 40
         color: "lightgrey"
         opacity: 0.8
         radius: 5
@@ -59,13 +60,23 @@ Rectangle {
             spacing: 10
 
             BusyIndicator {
+                id: busyIndicator
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
             Text {
+                id: topText
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "%1: %2%".arg(statusText).arg(progressText)
                 font.pixelSize: 16
+            }
+            Text {
+                id: bottonText
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: jobMessage
+                font.pixelSize: 12
+                wrapMode: Text.Wrap
+                width: parent.width
             }
         }
     }

@@ -36,6 +36,7 @@ class GenerateOfflineMap : public QQuickItem
   Q_OBJECT
 
   Q_PROPERTY(bool mapLoaded MEMBER m_mapLoaded NOTIFY mapLoadedChanged)
+  Q_PROPERTY(QString currentMessage READ currentMessage NOTIFY currentMessageChanged)
 
 public:
   explicit GenerateOfflineMap(QQuickItem* parent = nullptr);
@@ -53,9 +54,11 @@ signals:
   void updateStatus(const QString& status);
   void updateProgress(int progress);
   void showLayerErrors(const QString& error);
+  void currentMessageChanged();
 
 private:
   static const QString webMapId() { return s_webMapId; }
+  QString currentMessage() const;
 
 private:
   Esri::ArcGISRuntime::Map* m_map = nullptr;
@@ -65,6 +68,7 @@ private:
   static const QString s_webMapId;
   bool m_mapLoaded = false;
   QTemporaryDir m_tempPath;
+  QString m_currentMessage;
 };
 
 #endif // GENERATEOFFLINEMAP_H

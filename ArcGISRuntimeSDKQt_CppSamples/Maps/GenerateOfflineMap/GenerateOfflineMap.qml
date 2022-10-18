@@ -28,6 +28,7 @@ GenerateOfflineMapSample {
 
     onUpdateStatus: generateWindow.statusText = status;
     onUpdateProgress: generateWindow.progressText = progress;
+    onCurrentMessageChanged: generateWindow.jobMessage = offlineMapSample.currentMessage
     onHideWindow: {
         generateWindow.hideWindow(time);
 

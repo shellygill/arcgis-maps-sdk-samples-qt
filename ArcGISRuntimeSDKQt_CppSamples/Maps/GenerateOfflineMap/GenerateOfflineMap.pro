@@ -27,8 +27,17 @@ QT += opengl qml quick
 TEMPLATE = app
 TARGET = GenerateOfflineMap
 
-ARCGIS_RUNTIME_VERSION = 100.14
+ARCGIS_RUNTIME_VERSION = 100.15.0
 include($$PWD/arcgisruntime.pri)
+
+# path of the toolkit relative to the sample
+TOOLKIT_PRI_PATH = $$PWD/../../../../toolkit
+
+exists($$TOOLKIT_PRI_PATH/uitools/toolkitqml.pri) {
+    include($$TOOLKIT_PRI_PATH/uitools/toolkitcpp.pri)
+} else {
+    error(TOOLKIT_PRI_PATH is missing which is required to build this application.)
+}
 
 #-------------------------------------------------------------------------------
 

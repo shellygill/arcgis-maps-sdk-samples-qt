@@ -160,6 +160,13 @@ void GenerateOfflineMap::generateMapByExtent(double xCorner1, double yCorner1, d
         qDebug() << e.message() << e.additionalMessage();
       });
 
+
+      connect(generateJob, &GenerateOfflineMapJob::messageAdded, this, [this](const JobMessage& message)
+      {
+        m_currentMessage = message.message();
+        emit currentMessageChanged();
+      });
+
       // start the generate job
       generateJob->start();
     }
@@ -172,5 +179,10 @@ void GenerateOfflineMap::generateMapByExtent(double xCorner1, double yCorner1, d
 
   // generate parameters
   m_offlineMapTask->createDefaultGenerateOfflineMapParameters(mapExtent);
+}
+
+QString GenerateOfflineMap::currentMessage() const
+{
+  return m_currentMessage;
 }
 
