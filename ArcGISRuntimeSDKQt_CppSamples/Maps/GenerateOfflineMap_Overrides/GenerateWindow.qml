@@ -42,7 +42,7 @@ Rectangle {
 
     Rectangle {
         anchors.centerIn: parent
-        width: 140
+        width: 200
         height: busyIndicator.height + topText.height + bottonText.height + 40
         color: "lightgrey"
         opacity: 0.8
