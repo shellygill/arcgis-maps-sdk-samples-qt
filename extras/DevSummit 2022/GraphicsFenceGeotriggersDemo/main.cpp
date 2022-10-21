@@ -33,11 +33,26 @@ int main(int argc, char *argv[])
   app.setApplicationName(QString("FenceGraphicsDemo - C++"));
 
   // Access to Esri location services requires an API key. This can be copied below or used as a command line argument.
-  const QString apiKey = QString("");
-  setAPIKey(app, apiKey);
+//  const QString apiKey = QString("");
+//  setAPIKey(app, apiKey);
 
   // Initialize the sample
   FenceGraphicsDemo::init();
+
+  QCommandLineOption apiKeyOption("apikey", "Enter API Key", "apiKeyOption");
+
+  QCommandLineParser commandLineParser;
+  commandLineParser.setApplicationDescription("Sample app");
+  commandLineParser.addOption(apiKeyOption);
+  commandLineParser.addHelpOption();
+  commandLineParser.process(app);
+
+  const auto apiKeyString = commandLineParser.value(apiKeyOption);
+  if (!apiKeyString.isEmpty())
+  {
+    qDebug() << "setting API Key";
+    Esri::ArcGISRuntime::ArcGISRuntimeEnvironment::setApiKey(apiKeyString);
+  }
 
   // Initialize application view
   QQmlApplicationEngine engine;
