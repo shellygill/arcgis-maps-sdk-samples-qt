@@ -21,6 +21,7 @@ Rectangle {
     signal basemapBufferChanged(real buffer)
     signal removeSystemValvesChanged()
     signal removeServiceConnectionChanged()
+    signal leaveWaterPumpsOnlineChanged()
     signal hydrantWhereClauseChanged(string whereClause)
     signal clipWaterPipesAOIChanged(bool clip)
     signal overridesAccepted()
@@ -183,11 +184,29 @@ Rectangle {
                 }
             }
 
+            Button {
+                id: waterPumpsButton
+                text: "Leave Water Pumps layer online"
+                anchors {
+                    top: serviceConnCB.bottom
+                    topMargin: 32
+                    horizontalCenter: parent.horizontalCenter
+                }
+                font {
+                    pixelSize: 14
+                }
+
+                onClicked: {
+                    leaveWaterPumpsOnlineChanged();
+                    enabled = false;
+                }
+            }
+
             Text {
                 id: filterLabel
                 text: "Filter Hydrants:"
                 anchors {
-                    top: serviceConnCB.bottom
+                    top: waterPumpsButton.bottom
                     topMargin: 32
                     horizontalCenter: parent.horizontalCenter
                 }
