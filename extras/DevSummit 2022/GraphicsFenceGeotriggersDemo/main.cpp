@@ -41,9 +41,13 @@ int main(int argc, char *argv[])
 
   QCommandLineOption apiKeyOption("apikey", "Enter API Key", "apiKeyOption");
 
+  // set the license level
+  QCommandLineOption licenseOption(QStringList() << "licenselevel" << "l", QCoreApplication::translate("main", "the level of license"), QCoreApplication::translate("main","license"));
+
   QCommandLineParser commandLineParser;
   commandLineParser.setApplicationDescription("Sample app");
   commandLineParser.addOption(apiKeyOption);
+  commandLineParser.addOption(licenseOption);
   commandLineParser.addHelpOption();
   commandLineParser.process(app);
 
@@ -52,6 +56,13 @@ int main(int argc, char *argv[])
   {
     qDebug() << "setting API Key";
     Esri::ArcGISRuntime::ArcGISRuntimeEnvironment::setApiKey(apiKeyString);
+  }
+
+  const auto licenseString = commandLineParser.value(licenseOption);
+  if (!licenseString.isEmpty())
+  {
+    qDebug() << "setting license";
+    Esri::ArcGISRuntime::ArcGISRuntimeEnvironment::setLicense(licenseString);
   }
 
   // Initialize application view
