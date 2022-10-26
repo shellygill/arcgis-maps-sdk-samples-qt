@@ -18,6 +18,7 @@
 #include <QQmlEngine>
 
 #include "ArcGISRuntimeEnvironment.h"
+#include "Esri/ArcGISRuntime/Toolkit/register.h"
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -52,6 +53,22 @@ int main(int argc, char *argv[])
       Esri::ArcGISRuntime::ArcGISRuntimeEnvironment::setApiKey(apiKey);
   }
 
+  // set the license level
+  QCommandLineOption licenseOption(QStringList() << "licenselevel" << "l", QCoreApplication::translate("main", "the level of license"), QCoreApplication::translate("main","license"));
+
+  QCommandLineParser commandLineParser;
+  commandLineParser.setApplicationDescription("Sample app");
+  commandLineParser.addOption(licenseOption);
+  commandLineParser.addHelpOption();
+  commandLineParser.process(app);
+
+  const auto licenseString = commandLineParser.value(licenseOption);
+  if (!licenseString.isEmpty())
+  {
+    qDebug() << "setting license";
+    Esri::ArcGISRuntime::ArcGISRuntimeEnvironment::setLicense(licenseString);
+  }
+
   // Initialize the sample
   GenerateOfflineMapLocalBasemap::init();
 
@@ -60,6 +77,8 @@ int main(int argc, char *argv[])
   view.setResizeMode(QQuickView::SizeRootObjectToView);
 
   QString arcGISRuntimeImportPath = QUOTE(ARCGIS_RUNTIME_IMPORT_PATH);
+
+  Esri::ArcGISRuntime::Toolkit::registerComponents(*(view.engine()));
 
 #if defined(LINUX_PLATFORM_REPLACEMENT)
   // on some linux platforms the string 'linux' is replaced with 1
