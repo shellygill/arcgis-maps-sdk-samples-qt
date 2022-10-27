@@ -94,7 +94,6 @@ GenerateOfflineMap_OverridesSample {
         onRemoveSystemValvesChanged: removeSystemValves();
         onRemoveServiceConnectionChanged: removeServiceConnection();
         onHydrantWhereClauseChanged: setHydrantWhereClause(whereClause);
-        onLeaveWaterPumpsOnlineChanged: leaveWaterPumpsOnline();
         onOverridesAccepted: {
             generateWindow.visible = true;
             takeMapOffline();

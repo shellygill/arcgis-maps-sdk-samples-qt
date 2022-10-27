@@ -73,12 +73,6 @@ void GenerateOfflineMap_Overrides::componentComplete()
       return;
 
     m_mapLoaded = true;
-
-    qDebug() << m_map->operationalLayers()->size() << " layers";
-    for (auto layer : *m_map->operationalLayers())
-    {
-      qDebug() << layer->name() << (int) layer->layerType();
-    }
     emit mapLoadedChanged();
   });
 
@@ -110,8 +104,6 @@ void GenerateOfflineMap_Overrides::componentComplete()
           this, [this](QUuid /*id*/, GenerateOfflineMapParameterOverrides* parameterOverrides)
   {
     m_parameterOverrides = parameterOverrides;
-
-    qDebug() << m_parameterOverrides->onlineLayers().size() << " online layers";
     emit overridesReadyChanged();
     setBusy(false);
     emit taskBusyChanged();
@@ -206,14 +198,6 @@ void GenerateOfflineMap_Overrides::removeSystemValves()
 void GenerateOfflineMap_Overrides::removeServiceConnection()
 {
   removeFeatureLayer(QStringLiteral("Service Connection"));
-}
-
-void GenerateOfflineMap_Overrides::leaveWaterPumpsOnline()
-{
-  // 5th layer
-  auto waterPumpsLayer = getFeatureLayerByName("Water Pumps"); //m_map->operationalLayers()->at(4);
-  qDebug() << waterPumpsLayer->name();
-  m_parameterOverrides->setOnlineLayers({waterPumpsLayer});
 }
 
 void GenerateOfflineMap_Overrides::setHydrantWhereClause(const QString& whereClause)
