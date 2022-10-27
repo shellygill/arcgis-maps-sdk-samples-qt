@@ -269,59 +269,6 @@ void GenerateOfflineMap_Overrides::setHydrantWhereClause(const QString& whereCla
   m_parameterOverrides->setGenerateGeodatabaseParameters(dictionary);
 }
 
-void GenerateOfflineMap_Overrides::setClipWaterPipesAOI(bool clip)
-{
-  if (!overridesReady())
-    return;
-
-  FeatureLayer* targetLayer = getFeatureLayerByName(QStringLiteral("Main"));
-
-  if (!targetLayer)
-    return;
-
-  // Get the parameter key for the layer.
-  OfflineMapParametersKey keyForTargetLayer(targetLayer);
-
-  if (keyForTargetLayer.isEmpty() || keyForTargetLayer.type() != OfflineMapParametersType::GenerateGeodatabase)
-    return;
-
-  // Get the dictionary of GenerateGeoDatabaseParameters.
-  QMap<OfflineMapParametersKey, GenerateGeodatabaseParameters> dictionary = m_parameterOverrides->generateGeodatabaseParameters();
-
-  auto keyIt = dictionary.find(keyForTargetLayer);
-  if (keyIt == dictionary.end())
-    return;
-
-  // Grab the GenerateGeoDatabaseParameters associated with the given key.
-  GenerateGeodatabaseParameters& generateGdbParam = keyIt.value();
-
-  ServiceFeatureTable* table = qobject_cast<ServiceFeatureTable*>(targetLayer->featureTable());
-  if (!table)
-    return;
-
-  // Get the service layer id for the given layer.
-  const qint64 targetLayerId = table->layerInfo().serviceLayerId();
-
-  // Set whether to use the geometry filter to clip the waterpipes.
-  // If not then we get all the features.
-  QList<GenerateLayerOption> layerOptions = generateGdbParam.layerOptions();
-  for (auto& it : layerOptions)
-  {
-    GenerateLayerOption& option = it;
-    if (option.layerId() == targetLayerId)
-    {
-      option.setUseGeometry(clip);
-      break;
-    }
-  }
-
-  // Add layer options back to parameters and re-add to the dictionary.
-  generateGdbParam.setLayerOptions(layerOptions);
-
-  dictionary[keyForTargetLayer] = generateGdbParam;
-  m_parameterOverrides->setGenerateGeodatabaseParameters(dictionary);
-}
-
 void GenerateOfflineMap_Overrides::takeMapOffline()
 {
   if (!overridesReady())

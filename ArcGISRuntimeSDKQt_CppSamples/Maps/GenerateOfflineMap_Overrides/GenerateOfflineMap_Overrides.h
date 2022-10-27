@@ -60,7 +60,6 @@ public:
   Q_INVOKABLE void removeServiceConnection();
   Q_INVOKABLE void leaveWaterPumpsOnline();
   Q_INVOKABLE void setHydrantWhereClause(const QString& whereClause);
-  Q_INVOKABLE void setClipWaterPipesAOI(bool clip);
   Q_INVOKABLE void takeMapOffline();
 
 signals:

@@ -23,7 +23,6 @@ Rectangle {
     signal removeServiceConnectionChanged()
     signal leaveWaterPumpsOnlineChanged()
     signal hydrantWhereClauseChanged(string whereClause)
-    signal clipWaterPipesAOIChanged(bool clip)
     signal overridesAccepted()
 
     color: "#D6D6D6"
@@ -248,23 +247,6 @@ Rectangle {
                     id: metrics
                     font: filterComboBox.font
                 }
-            }
-
-            CheckBox {
-                id: clipCB
-                text: "Clip Water Pipes to AOI"
-                anchors {
-                    top: filterComboBox.bottom
-                    topMargin: 32
-                    horizontalCenter: parent.horizontalCenter
-                }
-                font {
-                    pixelSize: 14
-                }
-
-                checked: true
-
-                onCheckedChanged: clipWaterPipesAOIChanged(checked)
             }
         }
     }
