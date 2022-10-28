@@ -70,7 +70,9 @@ void setAPIKey(const QGuiApplication& app, QString apiKey)
     // Try parsing API key from command line argument, which uses the following syntax "-k <apiKey>".
     QCommandLineParser cmdParser;
     QCommandLineOption apiKeyArgument(QStringList{"k", "api"}, "The API Key property used to access Esri location services", "apiKeyInput");
+    QCommandLineOption licenseOption(QStringList{"licenselevel", "l"}, "the level of license", "licenseInput");
     cmdParser.addOption(apiKeyArgument);
+    cmdParser.addOption(licenseOption);
     cmdParser.process(app);
 
     apiKey = cmdParser.value(apiKeyArgument);
@@ -81,8 +83,13 @@ void setAPIKey(const QGuiApplication& app, QString apiKey)
                     "you to authenticate with an ArcGIS identity or set the API Key property.";
       return;
     }
+
+    const auto licenseString = cmdParser.value(licenseOption);
+    if (!licenseString.isEmpty())
+    {
+      Esri::ArcGISRuntime::ArcGISRuntimeEnvironment::setLicense(licenseString);
+    }
   }
 
   Esri::ArcGISRuntime::ArcGISRuntimeEnvironment::setApiKey(apiKey);
 }
-
