@@ -90,7 +90,6 @@ GenerateOfflineMap_OverridesSample {
         visible: overridesReady
 
         onBasemapLODSelected: setBasemapLOD(min, max);
-        onBasemapBufferChanged: setBasemapBuffer(buffer);
         onRemoveSystemValvesChanged: removeSystemValves();
         onRemoveServiceConnectionChanged: removeServiceConnection();
         onHydrantWhereClauseChanged: setHydrantWhereClause(whereClause);

@@ -66,6 +66,8 @@ void GenerateOfflineMap_Overrides::componentComplete()
   // Create a map from the Portal Item
   m_map = new Map(m_portalItem, this);
 
+  qDebug() << m_portalItem->url();
+
   // Update property once map is done loading
   connect(m_map, &Map::doneLoading, this, [this](Error e)
   {
@@ -155,38 +157,6 @@ void GenerateOfflineMap_Overrides::setBasemapLOD(int min, int max)
   ExportTileCacheParameters& exportTileCacheParam = dictionary[keyForTiledLayer];
   exportTileCacheParam.setLevelIds(newLODs);
 
-  m_parameterOverrides->setExportTileCacheParameters(dictionary);
-}
-
-void GenerateOfflineMap_Overrides::setBasemapBuffer(int bufferMeters)
-{
-  if (!overridesReady())
-    return;
-
-  LayerListModel* layers = m_map->basemap()->baseLayers();
-  if (!layers || layers->isEmpty())
-    return;
-
-  OfflineMapParametersKey keyForTiledLayer(layers->at(0));
-
-  if (keyForTiledLayer.isEmpty() || keyForTiledLayer.type() != OfflineMapParametersType::ExportTileCache)
-    return;
-
-  // Obtain the dictionary of parameters for taking the basemap offline.
-  QMap<OfflineMapParametersKey, ExportTileCacheParameters> dictionary = m_parameterOverrides->exportTileCacheParameters();
-  if (!dictionary.contains(keyForTiledLayer))
-    return;
-
-  // Create a new geometry around the original area of interest.
-  auto bufferGeom = GeometryEngine::buffer(m_parameters.areaOfInterest(), bufferMeters);
-
-  // Apply the geometry to the ExportTileCacheParameters.
-  ExportTileCacheParameters& exportTileCacheParam = dictionary[keyForTiledLayer];
-
-  // Set the parameters back into the dictionary.
-  exportTileCacheParam.setAreaOfInterest(bufferGeom);
-
-  //  Store the dictionary.
   m_parameterOverrides->setExportTileCacheParameters(dictionary);
 }
 

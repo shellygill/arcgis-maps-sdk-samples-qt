@@ -55,7 +55,6 @@ public:
 public:
   Q_INVOKABLE void setAreaOfInterest(double xCorner1, double yCorner1, double xCorner2, double yCorner2);
   Q_INVOKABLE void setBasemapLOD(int min, int max);
-  Q_INVOKABLE void setBasemapBuffer(int bufferMetres);
   Q_INVOKABLE void removeSystemValves();
   Q_INVOKABLE void removeServiceConnection();
   Q_INVOKABLE void setHydrantWhereClause(const QString& whereClause);

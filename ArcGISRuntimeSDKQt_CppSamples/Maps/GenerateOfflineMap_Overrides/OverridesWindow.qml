@@ -18,7 +18,6 @@ Rectangle {
     id: overridesPanel
     visible: overridesReady
     signal basemapLODSelected(real min, real max)
-    signal basemapBufferChanged(real buffer)
     signal removeSystemValvesChanged()
     signal removeServiceConnectionChanged()
     signal hydrantWhereClauseChanged(string whereClause)
@@ -117,40 +116,11 @@ Rectangle {
                 }
             }
 
-            Text {
-                id: basemapBufferLabel
-                text: "Basemap Buffer (m):"
-                anchors {
-                    top: lodRange.bottom
-                    topMargin: 32
-                    horizontalCenter: parent.horizontalCenter
-                }
-                font {
-                    pixelSize: 14
-                }
-                color: "#474747"
-            }
-
-            SpinBox {
-                id: basemapBufferSB
-                anchors {
-                    top: basemapBufferLabel.bottom
-                    topMargin: 8
-                    horizontalCenter: parent.horizontalCenter
-                }
-                from: 0
-                to: 500
-                stepSize: 50
-
-                font.pixelSize: 12
-                onValueChanged: basemapBufferChanged(value);
-            }
-
             Button {
                 id: systemVavlesCB
                 text: "Remove System Valves"
                 anchors {
-                    top: basemapBufferSB.bottom
+                    top: lodRange.bottom
                     topMargin: 32
                     horizontalCenter: parent.horizontalCenter
                 }

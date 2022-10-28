@@ -45,10 +45,12 @@ int main(int argc, char *argv[])
 //  const QString apiKey = QString("");
 
   QCommandLineOption apiKeyOption("apikey", "Enter API Key", "apiKeyOption");
+  QCommandLineOption licenseOption(QStringList() << "licenselevel" << "l", QCoreApplication::translate("main", "the level of license"), QCoreApplication::translate("main","license"));
 
   QCommandLineParser commandLineParser;
   commandLineParser.setApplicationDescription("Sample app");
   commandLineParser.addOption(apiKeyOption);
+  commandLineParser.addOption(licenseOption);
   commandLineParser.addHelpOption();
   commandLineParser.process(app);
 
@@ -63,6 +65,14 @@ int main(int argc, char *argv[])
       qWarning() << "Use of Esri location services, including basemaps, requires" <<
                     "you to authenticate with an ArcGIS identity or set the API Key property.";
   }
+
+  const auto licenseString = commandLineParser.value(licenseOption);
+  if (!licenseString.isEmpty())
+  {
+    qDebug() << "setting license";
+    Esri::ArcGISRuntime::ArcGISRuntimeEnvironment::setLicense(licenseString);
+  }
+
 
   // Initialize the sample
   GenerateOfflineMap_Overrides::init();
