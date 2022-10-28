@@ -72,6 +72,8 @@ void GeotriggersParcelDemo::setMapView(MapQuickView* mapView)
 
   m_mapView = mapView;
 
+  m_mapView->setViewpointScale(2000);
+
   loadMmpk();
 
   emit mapViewChanged();
