@@ -41,6 +41,7 @@ class FenceGraphicsDemo : public QObject
   Q_OBJECT
 
   Q_PROPERTY(Esri::ArcGISRuntime::MapQuickView* mapView READ mapView WRITE setMapView NOTIFY mapViewChanged)
+  Q_PROPERTY(bool polygonFence READ polygonFence WRITE setPolygonFence NOTIFY polygonFenceChanged)
 
 public:
   explicit FenceGraphicsDemo(QObject* parent = nullptr);
@@ -48,8 +49,11 @@ public:
 
   static void init();
 
+  Q_INVOKABLE void runGeotriggers();
+
 signals:
   void mapViewChanged();
+  void polygonFenceChanged();
 
 private:
   Esri::ArcGISRuntime::MapQuickView* mapView() const;
@@ -57,8 +61,10 @@ private:
   void initGeometries();
   void usePolygonFence();
   void usePointBufferFence();
-  void runGeotriggers();
   void initializeSimulatedLocationDisplay();
+
+  bool polygonFence() const;
+  void setPolygonFence(bool usePolygon);
 
   Esri::ArcGISRuntime::Map* m_map = nullptr;
   Esri::ArcGISRuntime::MapQuickView* m_mapView = nullptr;
@@ -78,7 +84,9 @@ private:
 
   Esri::ArcGISRuntime::LocationGeotriggerFeed* m_geotriggerFeed = nullptr;
 
-  int m_bufferSize;
+  int m_bufferSize = 0;
+
+  bool m_usePolygonFence = false;
 };
 
 #endif // FENCEGRAPHICSDEMO_H

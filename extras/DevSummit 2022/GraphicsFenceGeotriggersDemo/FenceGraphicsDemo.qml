@@ -29,6 +29,40 @@ Item {
             // Set and keep the focus on SceneView to enable keyboard navigation
             forceActiveFocus();
         }
+
+    }
+
+    Rectangle {
+        id: usePolygonRect
+        height: 20
+        width: 20
+        anchors {
+            top: parent.top
+            right: parent.right
+        }
+        color: "lightblue"
+        opacity: 0.5
+        MouseArea {
+            anchors.fill: parent
+            onClicked: { model.polygonFence = true; }
+        }
+    }
+
+    Rectangle {
+        id: startRect
+        height: 20
+        width: 20
+        anchors {
+            bottom: parent.bottom
+            right: parent.right
+            bottomMargin: 50
+        }
+        color: "lightgreen"
+        opacity: 0.5
+        MouseArea {
+            anchors.fill: parent
+            onClicked: { model.runGeotriggers(); }
+        }
     }
 
     // Declare the C++ instance which creates the scene etc. and supply the view

@@ -131,19 +131,29 @@ void FenceGraphicsDemo::setMapView(MapQuickView* mapView)
 
   m_mapView->setViewpoint(Viewpoint(m_polygon.extent()));
 
-  runGeotriggers();
-
   emit mapViewChanged();
+
+  connect(m_mapView, &MapQuickView::mouseDoubleClicked, this, [this](/*const QMouseEvent& e*/)
+  {
+    m_simulatedLocationDataSource->start();
+  });
 }
 
 void FenceGraphicsDemo::runGeotriggers()
 {
-  m_bufferSize = 2;
   m_horizontalAccuracy = 0;
   initializeSimulatedLocationDisplay();
 
-  //usePolygonFence();
-  usePointBufferFence();
+  if (m_usePolygonFence)
+  {
+    m_bufferSize = 0;
+    usePolygonFence();
+  }
+  else
+  {
+    m_bufferSize = 2;
+    usePointBufferFence();
+  }
 
   // The users location, input
   m_geotriggerFeed = new LocationGeotriggerFeed(
@@ -194,14 +204,14 @@ void FenceGraphicsDemo::runGeotriggers()
       qDebug() << "welcome!";
 
       /* We can edit the fence graphic directly */
-      //dynamic_cast<Graphic*>(fenceGeotriggerNotificationInfo->fenceGeoElement())->setSymbol(new SimpleFillSymbol(SimpleFillSymbolStyle::Solid, QColor("#8800ff00"), this));
+      // dynamic_cast<Graphic*>(fenceGeotriggerNotificationInfo->fenceGeoElement())->setSymbol(new SimpleFillSymbol(SimpleFillSymbolStyle::Solid, QColor("#8800ff00"), this));
       m_graphicsOverlay->graphics()->append(new Graphic(loc, new SimpleMarkerSymbol(SimpleMarkerSymbolStyle::Diamond, Qt::green, 15, this), this));
     }
     else
     {
       qDebug() << "goodbye!";
 
-      //dynamic_cast<Graphic*>(fenceGeotriggerNotificationInfo->fenceGeoElement())->setSymbol(new SimpleFillSymbol(SimpleFillSymbolStyle::Solid, QColor("#88ff0000"), this));
+      // dynamic_cast<Graphic*>(fenceGeotriggerNotificationInfo->fenceGeoElement())->setSymbol(new SimpleFillSymbol(SimpleFillSymbolStyle::Solid, QColor("#88ff0000"), this));
       m_graphicsOverlay->graphics()->append(new Graphic(loc, new SimpleMarkerSymbol(SimpleMarkerSymbolStyle::Diamond, Qt::red, 15, this), this));
     }
   });
@@ -220,5 +230,16 @@ void FenceGraphicsDemo::initializeSimulatedLocationDisplay()
   m_mapView->locationDisplay()->setDataSource(m_simulatedLocationDataSource);
   m_mapView->locationDisplay()->start();
 
-  m_simulatedLocationDataSource->start();
+
+}
+
+bool FenceGraphicsDemo::polygonFence() const
+{
+  return m_usePolygonFence;
+}
+
+void FenceGraphicsDemo::setPolygonFence(bool usePolygon)
+{
+  m_usePolygonFence = usePolygon;
+  emit polygonFenceChanged();
 }
