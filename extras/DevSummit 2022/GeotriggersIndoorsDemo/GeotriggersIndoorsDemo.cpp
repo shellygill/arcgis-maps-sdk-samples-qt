@@ -68,7 +68,7 @@ void GeotriggersIndoorsDemo::setMapView(MapQuickView* mapView)
 
 void GeotriggersIndoorsDemo::loadMmpk()
 {
-  MobileMapPackage* mmpk = new MobileMapPackage(QDir::homePath() + "/ArcGIS/Runtime/Data/mmpk/devSummitBerlin2022/BerlinDevSummit_10_13.mmpk", this);
+  MobileMapPackage* mmpk = new MobileMapPackage(QDir::homePath() + "/ArcGIS/Runtime/Data/mmpk/devSummitBerlin2022/BerlinDevSummit_10_20.mmpk", this);
 
   connect(mmpk, &MobileMapPackage::doneLoading, this, [mmpk, this]()
   {
@@ -91,10 +91,7 @@ void GeotriggersIndoorsDemo::loadMmpk()
       if (m_floorManager == nullptr)
       {
         qDebug() << "null floormanager";
-      }
-      else
-      {
-        qDebug("got floormanager");
+        return;
       }
 
       connect(m_floorManager, &FloorManager::errorOccurred, this, [](Error err)
@@ -129,12 +126,10 @@ void GeotriggersIndoorsDemo::loadMmpk()
     }
 
     m_indoorLayers = dynamic_cast<FeatureLayer*>(m_map->operationalLayers()->at(1));
-    m_indoorLayers->setVisible(false);
 
     m_layerToToggle = dynamic_cast<FeatureLayer*>(m_map->operationalLayers()->at(3));
-    m_layerToToggle->setVisible(false);
 
-    m_buildingFootprintTable = m_indoorLayers->featureTable();
+    m_buildingFootprintTable = m_layerToToggle->featureTable();
 
     initializeSimulatedLocationDisplay();
     runGeotriggers();
@@ -150,7 +145,8 @@ void GeotriggersIndoorsDemo::runGeotriggers()
   m_geotriggerFeed = new LocationGeotriggerFeed(m_locationDataSource, this);
 
   // Monitor the convention center footprint polygon
-  FeatureFenceParameters* featureFenceParameters = new FeatureFenceParameters(m_buildingFootprintTable, this);
+  FeatureFenceParameters* featureFenceParameters = new FeatureFenceParameters(m_buildingFootprintTable, 2.0, this);
+  featureFenceParameters->setWhereClause("NAME != ' '");
 
   // Create a fence geotrigger
   FenceGeotrigger* fenceGeotrigger = new FenceGeotrigger(m_geotriggerFeed, FenceRuleType::EnterOrExit, featureFenceParameters, this);
@@ -175,6 +171,31 @@ void GeotriggersIndoorsDemo::runGeotriggers()
       // hide the indoor layers and show the basemap
       m_layerToToggle->setVisible(false);
       m_map->operationalLayers()->at(0)->setVisible(true);
+    }
+
+    // Update which floor is shown
+    auto newLocation = fenceGeotriggerNotificationInfo->feedLocation();
+    auto additionalSourceProperties = newLocation.additionalSourceProperties();
+    if (additionalSourceProperties.contains(LocationSourcePropertiesKeys::floor()))
+    {
+      auto newFloor = additionalSourceProperties[LocationSourcePropertiesKeys::floor()].toInt();
+      if (newFloor == m_currentFloor)
+      {
+        return;
+      }
+
+      m_currentFloor = newFloor;
+
+      if (m_currentFloor == 0)
+      {
+        m_floorManager->levels().at(0)->setVisible(true);
+        m_floorManager->levels().at(1)->setVisible(false);
+      }
+      else if (m_currentFloor == 1)
+      {
+        m_floorManager->levels().at(0)->setVisible(false);
+        m_floorManager->levels().at(1)->setVisible(true);
+      }
     }
   });
 
@@ -207,39 +228,14 @@ void GeotriggersIndoorsDemo::initializeSimulatedLocationDisplay()
   };
 
   QList<Location> locations = {
-    createLocWithoutFloor(Point(1490693.7996604848, 6893194.7931713564, SpatialReference::webMercator())),
-    createLocWithFloor(Point(1490826.283691264, 6893204.0322787566, SpatialReference::webMercator()), 0),
-    createLocWithFloor(Point(1490891.9003579305, 6893214.6156120896, SpatialReference::webMercator()), 1),
-    createLocWithoutFloor(Point(1490974.6145278704, 6893211.6140904455, SpatialReference::webMercator()))
+    createLocWithoutFloor(Point(1490974.6145278704, 6893211.6140904455, SpatialReference::webMercator())),
+    createLocWithFloor(Point(1490881.8394986268, 6893259.0202687057, SpatialReference::webMercator()), 0),
+    createLocWithFloor(Point(1490817.7815411692, 6893245.6839692937, SpatialReference::webMercator()), 1),
+    createLocWithoutFloor(Point(1490693.7996604848, 6893194.7931713564, SpatialReference::webMercator()))
   };
 
   m_locationDataSource->setLocations(locations);
   m_locationDataSource->setIterationRate(0.3);
-
-  connect(m_locationDataSource, &AbstractLocationDataSource::locationChanged, this, [this](const Location& newLocation)
-  {
-    if (newLocation.additionalSourceProperties().contains(LocationSourcePropertiesKeys::floor()))
-    {
-      auto newFloor = newLocation.additionalSourceProperties()[LocationSourcePropertiesKeys::floor()].toInt();
-      if (newFloor == m_currentFloor)
-      {
-        return;
-      }
-
-      m_currentFloor = newFloor;
-
-      if (m_currentFloor == 0)
-      {
-        m_floorManager->levels().at(0)->setVisible(true);
-        m_floorManager->levels().at(1)->setVisible(false);
-      }
-      else if (m_currentFloor == 1)
-      {
-        m_floorManager->levels().at(0)->setVisible(false);
-        m_floorManager->levels().at(1)->setVisible(true);
-      }
-    }
-  });
 
   m_mapView->locationDisplay()->setDataSource(m_locationDataSource);
   m_mapView->locationDisplay()->setAutoPanMode(LocationDisplayAutoPanMode::Off);
