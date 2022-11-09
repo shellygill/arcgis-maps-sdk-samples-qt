@@ -18,6 +18,7 @@
 #include "Geotriggers.h"
 #include "ArcGISRuntimeEnvironment.h"
 
+#include <QCommandLineParser>
 #include <QDir>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -35,15 +36,31 @@ int main(int argc, char *argv[])
   // 2. API key: A permanent key that gives your application access to Esri
   //    location services. Visit your ArcGIS Developers Dashboard create a new
   //    API keys or access an existing API key.
-  const QString apiKey = QString("");
+
+  // Try parsing API key from command line argument, which uses the following syntax "-k <apiKey>".
+  QCommandLineParser cmdParser;
+  QCommandLineOption apiKeyArgument(QStringList{"k", "apikey"}, "The API Key property used to access Esri location services", "apiKeyInput");
+  QCommandLineOption licenseOption(QStringList{"licenselevel", "l"}, "the level of license", "licenseInput");
+  cmdParser.addOption(apiKeyArgument);
+  cmdParser.addOption(licenseOption);
+  cmdParser.process(app);
+
+  auto apiKey = cmdParser.value(apiKeyArgument);
+
   if (apiKey.isEmpty())
   {
-      qWarning() << "Use of Esri location services, including basemaps, requires" <<
-                    "you to authenticate with an ArcGIS identity or set the API Key property.";
+    qWarning() << "Use of Esri location services, including basemaps, requires" <<
+                  "you to authenticate with an ArcGIS identity or set the API Key property.";
   }
   else
   {
-      Esri::ArcGISRuntime::ArcGISRuntimeEnvironment::setApiKey(apiKey);
+    Esri::ArcGISRuntime::ArcGISRuntimeEnvironment::setApiKey(apiKey);
+  }
+
+  const auto licenseString = cmdParser.value(licenseOption);
+  if (!licenseString.isEmpty())
+  {
+    Esri::ArcGISRuntime::ArcGISRuntimeEnvironment::setLicense(licenseString);
   }
 
   // Initialize the sample

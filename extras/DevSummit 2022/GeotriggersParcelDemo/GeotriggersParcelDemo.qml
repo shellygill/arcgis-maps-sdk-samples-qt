@@ -31,6 +31,18 @@ Item {
         }
     }
 
+    Pane {
+        anchors {
+            top: parent.top
+            horizontalCenter: parent.horizontalCenter
+            topMargin: 20
+        }
+        TextEdit {
+            text: "\"RecAC > .18\""
+
+        }
+    }
+
     // Declare the C++ instance which creates the scene etc. and supply the view
     GeotriggersParcelDemoSample {
         id: model

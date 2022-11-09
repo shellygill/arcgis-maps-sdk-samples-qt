@@ -97,8 +97,6 @@ void GeotriggersParcelDemo::loadMmpk()
   mmpk->load();
 }
 
-// check I can commit
-
 void GeotriggersParcelDemo::runGeotriggers()
 {
   m_userHorizontalAccuracy = 10;
@@ -106,22 +104,17 @@ void GeotriggersParcelDemo::runGeotriggers()
   // user's location to be used as input data for geotrigger monitor
   m_geotriggerFeed = new LocationGeotriggerFeed(m_locationDataSource, this);
 
-  // Can filter out notifications when horizontal accuracy is too poor
-  // m_geotriggerFeed->setFilter(new ArcadeExpression("$locationupdate.horizontalaccuracy <= 10", this));
-
   FeatureFenceParameters* featureFenceParameters = new FeatureFenceParameters(m_parcelsTable, this);
 
   // Read values from the fence feature's attributes table
   featureFenceParameters->setWhereClause("RecAC > .18");
 
   FenceGeotrigger* fenceGeotrigger = new FenceGeotrigger(m_geotriggerFeed, FenceRuleType::Enter, featureFenceParameters, this);
-  fenceGeotrigger->setFeedAccuracyMode(FenceGeotriggerFeedAccuracyMode::UseGeometryWithAccuracy);
-  fenceGeotrigger->setEnterExitSpatialRelationship(FenceEnterExitSpatialRelationship::EnterIntersectsAndExitDoesNotIntersect);
 
   // create a GeotriggerMonitor to monitor the fence features
   GeotriggerMonitor* geotriggerMonitor = new GeotriggerMonitor(fenceGeotrigger, this);
 
-  // Slot to handle notification signals that meet the parameters
+  // Listen for notification signals that meet the parameters
   connect(geotriggerMonitor, &GeotriggerMonitor::geotriggerNotification, this, [this](GeotriggerNotificationInfo* geotriggerNotificationInfo)
   {
     FenceGeotriggerNotificationInfo* fenceGeotriggerNotificationInfo = static_cast<FenceGeotriggerNotificationInfo*>(geotriggerNotificationInfo);
