@@ -69,7 +69,7 @@ void setAPIKey(const QGuiApplication& app, QString apiKey)
   {
     // Try parsing API key from command line argument, which uses the following syntax "-k <apiKey>".
     QCommandLineParser cmdParser;
-    QCommandLineOption apiKeyArgument(QStringList{"k", "api"}, "The API Key property used to access Esri location services", "apiKeyInput");
+    QCommandLineOption apiKeyArgument(QStringList{"k", "apikey"}, "The API Key property used to access Esri location services", "apiKeyInput");
     QCommandLineOption licenseOption(QStringList{"licenselevel", "l"}, "the level of license", "licenseInput");
     cmdParser.addOption(apiKeyArgument);
     cmdParser.addOption(licenseOption);

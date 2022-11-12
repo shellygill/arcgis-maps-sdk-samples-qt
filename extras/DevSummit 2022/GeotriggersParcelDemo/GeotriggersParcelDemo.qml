@@ -31,15 +31,33 @@ Item {
         }
     }
 
-    Pane {
+    Button {
         anchors {
             top: parent.top
             horizontalCenter: parent.horizontalCenter
             topMargin: 20
         }
-        TextEdit {
-            text: "\"RecAC > .18\""
+        text: "\"RecAC > .18\""
+        onClicked: {
+            model.useWhereClause = true;
+            highlighted = true;
+        }
+    }
 
+    Rectangle {
+        id: startRect
+        height: 20
+        width: 20
+        anchors {
+            bottom: parent.bottom
+            right: parent.right
+            bottomMargin: 50
+        }
+        color: "lightgreen"
+        opacity: 0.5
+        MouseArea {
+            anchors.fill: parent
+            onClicked: { model.runGeotriggers(); }
         }
     }
 

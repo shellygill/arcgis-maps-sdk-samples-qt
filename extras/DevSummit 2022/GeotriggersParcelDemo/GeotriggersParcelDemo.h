@@ -38,6 +38,7 @@ class GeotriggersParcelDemo : public QObject
   Q_OBJECT
 
   Q_PROPERTY(Esri::ArcGISRuntime::MapQuickView* mapView READ mapView WRITE setMapView NOTIFY mapViewChanged)
+  Q_PROPERTY(bool useWhereClause READ useWhereClause WRITE setUseWhereClause NOTIFY useWhereClauseChanged)
 
 public:
   explicit GeotriggersParcelDemo(QObject* parent = nullptr);
@@ -45,16 +46,21 @@ public:
 
   static void init();
 
+  Q_INVOKABLE void runGeotriggers();
+
 signals:
   void mapViewChanged();
+  void useWhereClauseChanged();
 
 private:
   Esri::ArcGISRuntime::MapQuickView* mapView() const;
   void setMapView(Esri::ArcGISRuntime::MapQuickView* mapView);
 
+  bool useWhereClause() const;
+  void setUseWhereClause(bool useWhereClause);
+
   void loadMmpk();
   void initializeSimulatedLocationDisplay();
-  void runGeotriggers();
   void delay();
 
   Esri::ArcGISRuntime::Map* m_map = nullptr;
@@ -66,6 +72,7 @@ private:
   Esri::ArcGISRuntime::FeatureTable* m_parcelsTable = nullptr;
 
   int m_userHorizontalAccuracy = 0;
+  bool m_useWhereClause = false;
 };
 
 #endif // GEOTRIGGERSPARCELDEMO_H

@@ -72,11 +72,20 @@ void GeotriggersParcelDemo::setMapView(MapQuickView* mapView)
 
   m_mapView = mapView;
 
-  m_mapView->setViewpointScale(2000);
-
   loadMmpk();
 
   emit mapViewChanged();
+}
+
+bool GeotriggersParcelDemo::useWhereClause() const
+{
+  return m_useWhereClause;
+}
+
+void GeotriggersParcelDemo::setUseWhereClause(bool useWhereClause)
+{
+  m_useWhereClause = useWhereClause;
+  emit useWhereClauseChanged();
 }
 
 void GeotriggersParcelDemo::loadMmpk()
@@ -91,7 +100,7 @@ void GeotriggersParcelDemo::loadMmpk()
     m_parcelsTable = m_parcelsLayer->featureTable();
     m_parcelsTable->load();
 
-    runGeotriggers();
+    m_mapView->setViewpointScale(5000);
   });
 
   mmpk->load();
@@ -107,7 +116,10 @@ void GeotriggersParcelDemo::runGeotriggers()
   FeatureFenceParameters* featureFenceParameters = new FeatureFenceParameters(m_parcelsTable, this);
 
   // Read values from the fence feature's attributes table
-  featureFenceParameters->setWhereClause("RecAC > .18");
+  if (m_useWhereClause)
+  {
+    featureFenceParameters->setWhereClause("RecAC > .18");
+  }
 
   FenceGeotrigger* fenceGeotrigger = new FenceGeotrigger(m_geotriggerFeed, FenceRuleType::Enter, featureFenceParameters, this);
 
