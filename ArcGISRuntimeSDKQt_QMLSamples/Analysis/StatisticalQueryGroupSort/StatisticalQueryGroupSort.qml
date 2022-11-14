@@ -35,15 +35,24 @@ Rectangle {
         onLoadStatusChanged: {
             if (loadStatus !== Enums.LoadStatusLoaded)
                 return;
+            statisticOptionsPage.fields.clear();
 
-            const fieldModel = [];
             for (let i = 0; i < fields.length; i++) {
-                fieldModel.push(fields[i].name);
+                // set "State" to be true so we start with one box checked as an example
+                let name = fields[i].name;
+                if (name === "State") {
+                    statisticOptionsPage.fields.append({"name": name, "value": true});
+                }
+                else {
+                    statisticOptionsPage.fields.append({"name": name, "value": false});
+                }
             }
-            statisticOptionsPage.fields = fieldModel;
+            // initialize fields ComboBox
+            statisticOptionsPage.fieldComboBox.initComboBox();
         }
 
         onQueryStatisticsStatusChanged: {
+
             if (queryStatisticsStatus === Enums.TaskStatusErrored) {
                 resultsModel.clear();
                 resultsModel.append({"section": "", "statistic": "Error. %1".arg(error.message)});

@@ -21,11 +21,17 @@ Rectangle {
     readonly property real pageWidth: rootOptionsPage.width - flickable.anchors.margins * 2
     readonly property real labelTextSize: 12
     readonly property var statisticTypes: ["Average", "Count", "Maximum", "Minimum", "Standard Deviation", "Sum", "Variance"]
-    property var fields: null
+    property alias fields: fields
     property var groupingFields: []
     property alias statisticsModel: statisticsModel
     property alias orderByModel: orderByModel
+    property alias fieldComboBox : fieldComboBox
     signal statisticButtonClicked()
+
+    // Setup a list model for fields (which will be set in StatisticalQueryGroupSort.qml in ServiceFeatureTable::onLoadStatusChanged)
+    ListModel {
+        id: fields
+    }
 
     // Setup a list model with some defaults pre-set
     ListModel {
@@ -128,11 +134,13 @@ Rectangle {
                             property int modelWidth: 0
                             width: modelWidth + leftPadding + rightPadding
                             model: fields
-                            onModelChanged: {
+                            textRole: 'name'
+
+                            function initComboBox () {
                                 if (!fields)
                                     return;
-                                for (let i = 0; i < model.length; ++i) {
-                                    metricsFieldComboBox.text = model[i];
+                                for (let i = 0; i < model.count; ++i) {
+                                    metricsFieldComboBox.text = model.get(i).name;
                                     modelWidth = Math.max(modelWidth, metricsFieldComboBox.width);
                                 }
                             }
@@ -171,6 +179,9 @@ Rectangle {
                             width: 30
                             height: width
                             onClicked: {
+                                console.log(fieldComboBox.currentText);
+                                console.log(statisticComboBox.currentText);
+
                                 for (let i = 0; i < statisticsModel.count; i++) {
                                     if (statisticsModel.get(i).field === fieldComboBox.currentText) {
                                         if (statisticsModel.get(i).statistic === statisticComboBox.currentText)
@@ -280,11 +291,20 @@ Rectangle {
 
                                 CheckBox {
                                     anchors.verticalCenter: parent.verticalCenter
-                                    text: modelData
-                                    checked: text === "State"
+                                    text: model.name
+                                    checked: model.value
                                     onCheckedChanged: {
+                                        fieldView.currentIndex = index;
+
+                                        console.log(text);
+
+                                        // need to keep track of the checked value inside the fields ListModel
+                                        fields.setProperty(index, "value", checked);
+
                                         if (checked) {
-                                            groupingFields.push(text);
+                                            if (groupingFields.indexOf(text) === -1) {
+                                                groupingFields.push(text);
+                                            }
                                         } else {
                                             // remove the item from the selected list
                                             const i = groupingFields.indexOf(text);
@@ -301,7 +321,9 @@ Rectangle {
 
                                     onClicked: fieldView.currentIndex = index;
                                 }
+
                             }
+
                         }
                     }
                 }
@@ -317,18 +339,21 @@ Rectangle {
                         height: width
                         text: ">"
                         onClicked: {
+                            console.log(fieldView.currentIndex);
+                            console.log(fields.get(fieldView.currentIndex).name);
+
                             // return if the field is not selected
-                            if (groupingFields.indexOf(fields[fieldView.currentIndex]) === -1)
+                            if (groupingFields.indexOf(fields.get(fieldView.currentIndex).name) === -1)
                                 return;
 
                             // return if the field is already added
                             for (let i =  0; i < orderByModel.count; i++) {
-                                if (orderByModel.get(i).field === fields[fieldView.currentIndex])
+                                if (orderByModel.get(i).field === fields.get(fieldView.currentIndex).name)
                                     return;
                             };
 
                             // add the data to the model
-                            orderByModel.append({field: fields[fieldView.currentIndex], order: "Ascending"});
+                            orderByModel.append({field: fields.get(fieldView.currentIndex).name, order: "Ascending"});
                         }
                     }
 
@@ -393,6 +418,7 @@ Rectangle {
                                     anchors.fill: parent
                                     onClicked: groupingView.currentIndex = index;
                                 }
+
                             }
                         }
                     }
