@@ -88,6 +88,17 @@ void GeotriggersParcelDemo::setUseWhereClause(bool useWhereClause)
   emit useWhereClauseChanged();
 }
 
+bool GeotriggersParcelDemo::useBufferDistance() const
+{
+  return m_useBufferDistance;
+}
+
+void GeotriggersParcelDemo::setUseBufferDistance(bool useBufferDistance)
+{
+  m_useBufferDistance = useBufferDistance;
+  emit useBufferDistanceChanged();
+}
+
 void GeotriggersParcelDemo::loadMmpk()
 {
   MobileMapPackage* mmpk = new MobileMapPackage(QDir::homePath() + "/ArcGIS/Runtime/Data/mmpk/parcels.mmpk", this);
@@ -113,7 +124,9 @@ void GeotriggersParcelDemo::runGeotriggers()
   // user's location to be used as input data for geotrigger monitor
   m_geotriggerFeed = new LocationGeotriggerFeed(m_locationDataSource, this);
 
-  FeatureFenceParameters* featureFenceParameters = new FeatureFenceParameters(m_parcelsTable, this);
+  double bufferDistance = m_useBufferDistance ? 10.0 : 0.0;
+
+  FeatureFenceParameters* featureFenceParameters = new FeatureFenceParameters(m_parcelsTable, bufferDistance, this);
 
   // Read values from the fence feature's attributes table
   if (m_useWhereClause)

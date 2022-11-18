@@ -320,13 +320,16 @@ void GenerateOfflineMap_Overrides::removeFeatureLayer(const QString& layerName)
   if (!overridesReady())
     return;
 
+  // Get the layer you want to remove
   FeatureLayer* targetLayer = getFeatureLayerByName(layerName);
   if (!targetLayer)
     return;
 
   // Get the parameter key for the layer.
+  // The key is used to lookup values in a dictionary
   OfflineMapParametersKey keyForTargetLayer(targetLayer);
 
+  // Because this is a feature layer, the parameters will be in GenerateGeodatabaseParameters
   if (keyForTargetLayer.isEmpty() || keyForTargetLayer.type() != OfflineMapParametersType::GenerateGeodatabase)
     return;
 

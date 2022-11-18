@@ -32,6 +32,7 @@ Item {
     }
 
     Button {
+        id: whereClauseButton
         anchors {
             top: parent.top
             horizontalCenter: parent.horizontalCenter
@@ -40,6 +41,18 @@ Item {
         text: "\"RecAC > .18\""
         onClicked: {
             model.useWhereClause = true;
+            highlighted = true;
+        }
+    }
+    Button {
+        anchors {
+            top: whereClauseButton.bottom
+            horizontalCenter: parent.horizontalCenter
+            topMargin: 10
+        }
+        text: "bufferDistance = 10"
+        onClicked: {
+            model.useBufferDistance = true;
             highlighted = true;
         }
     }
